@@ -1,0 +1,6 @@
+#!/bin/bash
+#discoveryutil udnsflushcaches
+
+dscacheutil -flushcache
+killall -HUP mDNSResponder
+echo "DNS Flushed"

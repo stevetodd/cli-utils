@@ -1,0 +1,21 @@
+#!/bin/bash
+
+NORMAL=$(tput sgr0)
+UNDERLINE=$(tput smul)
+
+src="/bin/ls -1d -- */"
+
+if [[ -p /dev/stdin ]]; then
+  src="cat /dev/stdin"
+fi
+
+$src | parallel "echo '${UNDERLINE}{}:${NORMAL}'; cd {}; $*"
+
+# non-parallel
+#$src | while IFS= read -r line; do
+#  pushd $line > /dev/null
+#  echo ${UNDERLINE}$line:${NORMAL} 
+#  $*
+#  popd > /dev/null
+#done
+#

@@ -1,0 +1,104 @@
+#!/usr/local/bin/pythonw2.7
+
+# Half-baked HTTP server that simply echos GETs and POSTs and provides a 200 response. Has the 
+# additional feature of formatting and syntax highlighting POST bodies as well as decompressing 
+# gzipped bodies.
+#
+# To use, just type in `http-cat`, or if you want, pass the port.
+#
+# Extension of these works: 
+# https://gist.github.com/huyng/814831
+# https://gist.github.com/1kastner/e083f9e813c0464e6a2ec8910553e632
+
+from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+from optparse import OptionParser
+from pygments import highlight
+from pygments.lexers import JsonLexer, get_lexer_for_mimetype
+from pygments.formatters import TerminalFormatter
+from pygments.util import ClassNotFound
+import sys
+import zlib
+import json
+
+class RequestHandler(BaseHTTPRequestHandler):
+    
+    def do_GET(self):
+        
+        request_path = self.path
+        
+        print("\n----- Request Start ----->\n")
+        print(request_path)
+        print(self.headers)
+        print("<----- Request End -----\n")
+        
+        self.send_response(200)
+        self.end_headers()
+        
+    def do_POST(self):
+        
+        request_path = self.path
+        
+        print("\n----- Request Start ----->\n")
+        print(request_path)
+        
+        request_headers = self.headers
+        content_length = request_headers.getheaders('content-length')
+        length = int(content_length[0]) if content_length else 0
+        
+        print(request_headers)
+ 
+        content_encoding = request_headers.getheaders('content-encoding')
+        encoding = content_encoding[0] if content_encoding else 'text'
+        
+        if  encoding == 'gzip':
+            content = zlib.decompress(self.rfile.read(length), 16+zlib.MAX_WBITS)
+        else:
+            content = self.rfile.read(length)
+
+        content_type = request_headers.getheaders('content-type')
+        content_type = content_type[0] if content_type else 'text'
+
+        if content_type:
+            content = json.loads(content)
+            content = json.dumps(content, indent=2)
+            try:
+                lexer = get_lexer_for_mimetype(content_type)
+                content = highlight(unicode(content, 'UTF-8'), lexer, TerminalFormatter())
+            except ClassNotFound:
+                pass
+                
+        print(content)
+
+
+        print("<----- Request End -----\n")
+        
+        self.send_response(200)
+        self.end_headers()
+    
+    do_PUT = do_POST
+    do_DELETE = do_GET
+        
+def main():
+    if len(sys.argv) > 2:
+       port = int(sys.argv[2])
+       i = sys.argv[1]
+    elif len(sys.argv) > 1:
+       port = int(sys.argv[1])
+       i = ""
+    else:
+       port = 8000
+       i = ""
+
+    print('Listening on localhost:%s' % port)
+    server = HTTPServer(('', port), RequestHandler)
+    server.serve_forever()
+
+        
+if __name__ == "__main__":
+    #parser = OptionParser()
+    #parser.usage = ("Creates an http-server that will echo out any GET or POST parameters\n"
+    #                "Run:\n\n"
+    #                "   reflect")
+    #(options, args) = parser.parse_args()
+    
+    main()
