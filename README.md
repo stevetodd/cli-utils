@@ -41,7 +41,7 @@ a pull request :).
 Utility that flushes DNS on MacOS. I always forget the command so I just "documented" it in a small
 shell script.
 
-## `whatsmyip`
+## `whatsmyip` and `whatsmyip6`
 
-A simple wrapper around `curl ifconfig.me`
+Automates connecting to a remote site to retrieve IPv4 and IPv6 addresses, each command respectively.
 

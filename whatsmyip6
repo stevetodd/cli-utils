@@ -1,0 +1,2 @@
+#!/bin/bash
+curl -6 'https://api6.ipify.org'
