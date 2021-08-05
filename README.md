@@ -26,14 +26,14 @@ each of the repo directories in the same parent directory, simply run `inall git
 This command has the added capability to read directory names from STDIN, in case you either want
 to selectively choose the directories or want to modify the order in which the command is run.
 
-### `in COMMAND [ARGS ...]`
+### `in DIR COMMAND [ARGS ...]`
 
 Sometimes you are doing a lot of work out of a parent directory and it sucks to do
 `cd dir; foo; cd ..` a lot. This command simplifies the process to `in dir foo`.
 
 ### Caveats
 
-Unfortunately, aliases you can't use aliases from your shell. If you know how to do that, I'd love
+Unfortunately, you can't use aliases from your shell script. If you know how to do that, I'd love
 a pull request :).
 
 ## `mac-flush-dns`
